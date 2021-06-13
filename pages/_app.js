@@ -1,4 +1,4 @@
-import '../styles/globals.css'
+import '../styles/globals.scss'
 import CustomHead from '../components/CustomHead'
 import Footer from '../components/Footer.tsx'
 import Header from '../components/Header.tsx'
