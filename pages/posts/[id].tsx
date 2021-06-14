@@ -25,17 +25,17 @@ export default function SinglePost(props){
     />
 }
 
-export async function getStaticProps({params}){
+export async function getServerSideProps({params}){
     var res = await pDatabase.collection("posts").doc(params.id).get();
     return {props: {...res.data(),id: params.id}}
 }
 
-export async function getStaticPaths(){
-    var arr = [];
-    var res = await pDatabase.collection("posts").doc("data").get();
-    res.data()["ids"].forEach(id => arr.push({
-        params: {id: id}
-    }));
-    console.log(arr);
-    return {paths: arr, fallback: false}
-}
+// export async function getStaticPaths(){
+//     var arr = [];
+//     var res = await pDatabase.collection("posts").doc("data").get();
+//     res.data()["ids"].forEach(id => arr.push({
+//         params: {id: id}
+//     }));
+//     console.log(arr);
+//     return {paths: arr, fallback: false}
+// }
