@@ -42,7 +42,7 @@ export default function Post(props){
         setSaving(true);
         try{
             await pDatabase.collection("posts").doc(props.id).update({
-                title, subtitle, author, body,topics, imageURL, dateModified: (new Date()).getTime(),
+                title, subtitle, author, body,topics, imageURL, dateModified: (new Date()).getTime(), isFeatured
             })
         }catch(e){
             console.error(e);
@@ -125,6 +125,10 @@ export default function Post(props){
                 </li>
             </ul>
         </div>
+        <section id="isFeatured">
+            {isEditor?<button className={isFeatured?"featured":"notFeatured"} onClick={()=>setIsFeatured(!isFeatured)}>{isFeatured?"Featured ":"Not Featured"}</button>:
+           <div className="featured">Featured</div>}
+        </section>
         <section id="jumbo-image" style={{backgroundImage: `url(${imageURL})`, backgroundSize: "cover"}}>
             {isEditor&&<div id="upload-jimage"><p>Upload A New Image</p><input type="file" onChange={uploadJumboImage}></input></div>}
         </section>

@@ -22,6 +22,7 @@ export default function SinglePost(props){
         body={props.body}
         isEditor={loggedIn} //if logged in and can edit
         id={props.id}
+        isFeatured={props.isFeatured}
     />
 }
 
