@@ -22,6 +22,7 @@ export default function Post(props){
     const [body,setBody] = useState(props.body);
     const [topics,setTopics] = useState(props.topics)
     const [imageURL,setImageURL] = useState(props.imageURL);
+    const [isFeatured,setIsFeatured] = useState(props.isFeatured)
 
     const [togglePreview,setTogglePreview] = useState(false);
     const [topicInput,setTopicInput] = useState("");

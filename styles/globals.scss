@@ -9,10 +9,29 @@
   align-items: center;
 }
 
+@mixin col{
+  @include row();
+  flex-direction: column;
+}
+
 @mixin line{
   background-color: transparent;
   height: 0px;
   border-bottom: 3px solid white;
+}
+
+@mixin b-line{
+  background-color: transparent;
+  height: 0px;
+  border-bottom: 3px solid black;
+}
+
+@mixin hoverer1{
+  transition: all 0.3s;
+  &:hover{
+    opacity: 0.9;
+    transform: translate(-1%,-2%);
+  }
 }
 
 :root{
@@ -159,49 +178,46 @@ header{
   flex-direction: column;
   margin-top: 20vh;
   margin-bottom: 50vh;
-  #single-post{
-    margin-bottom: 10vh;
-    transition: all 0.3s;
-    &:hover{
-      opacity: 0.9;
-      transform: translate(-1%,-2%);
+}
+
+#single-post{
+  margin-bottom: 10vh;
+  @include hoverer1();
+  max-width: 1200px;
+  width: 90vw;
+  aspect-ratio: 5/2;
+  background-color: white;
+  color:black;
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  position: relative;
+  .post-image{
+    height: 100%;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+  }
+  .post-info{
+    padding: 5%;
+    h3{
+      font-size: 2.7vw;
+      margin: 0px;
     }
-    max-width: 1200px;
-    width: 90vw;
-    aspect-ratio: 5/2;
-    background-color: white;
-    color:black;
-    display: grid;
-    grid-template-columns: 2fr 3fr;
-    position: relative;
-    .post-image{
-      height: 100%;
-      width: 100%;
-      background-size: cover;
-      background-position: center;
+    p.subtitle{
+      font-size: 1vw;
+      margin: 5px 0px 15px 0px;
     }
-    .post-info{
-      padding: 5%;
-      h3{
-        font-size: 2.7vw;
-        margin: 0px;
-      }
-      p.subtitle{
-        font-size: 1vw;
-        margin: 5px 0px 15px 0px;
-      }
-      p.author{
-        margin: 0px;
-        font-weight: bold;
-      }
-      p.date{
-        position: absolute;
-        bottom: 0px;
-        right: 0px;
-        padding: 15px;
-        margin: 0px;
-        font-weight: bold;
-      }
+    p.author{
+      margin: 0px;
+      font-weight: bold;
+    }
+    p.date{
+      position: absolute;
+      bottom: 0px;
+      right: 0px;
+      padding: 15px;
+      margin: 0px;
+      font-weight: bold;
     }
   }
 }
@@ -489,7 +505,46 @@ header{
   }
 }
 
-
+#topics-list{
+  @include col();
+  li{
+    width: 80vw;
+    height: 25vw;
+    margin-bottom: 10vh;
+    background-position: center;
+    @include hoverer1();
+    .topic{
+      background-color: rgba(256,256,256,0.8);
+      padding: 20px 2vw;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      h3{
+        margin: 0px;
+        margin-left: 5%;
+        margin-top: 30px;
+        font-size: 3vw;
+      }
+      p.horiz-line{
+        @include b-line();
+        width: 60%;
+        transform: translateX(-10%);
+      }
+      p.vert-line{
+        height: 70%;
+        border-left: 3px solid black;
+        position: absolute;
+        top: 2%;
+        left: 5%;
+      }
+      p.description{
+        margin-left: 5%;
+        font-size: 1.7vw;
+        margin-right: 10%;
+      }
+    }
+  }
+}
 
 footer{
   @include center();
