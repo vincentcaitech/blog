@@ -1,4 +1,5 @@
 import firebase from "firebase"
+import "firebase/storage";
 
 var firebaseConfig = {
     apiKey: "AIzaSyAR-610He9yA8MDj9oqEG7eVHM0UYAxiW4",
@@ -17,5 +18,7 @@ if (!firebase.apps.length) {
 }
 const pAuth = firebase.auth();
 const pDatabase = firebase.firestore();
+const pStorage = firebase.storage().ref();
+const fbFieldValue = firebase.firestore.FieldValue;
 
-export {pAuth,pDatabase};
+export {pAuth,pDatabase,pStorage, fbFieldValue};
