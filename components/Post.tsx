@@ -14,7 +14,7 @@ import { PContext } from "../services/context";
 
 export default function Post(props){
     const router = useRouter();
-    const isEditor = useContext(PContext)["loggedIn"]
+    const isEditor = useContext(PContext)["isAdmin"]
     const [title,setTitle] = useState(props.title);
     const [subtitle,setSubtitle] = useState(props.subtitle);
     const [author,setAuthor] = useState(props.author);

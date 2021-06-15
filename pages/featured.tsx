@@ -25,8 +25,6 @@ export default function Featured(){
         console.log(docs);
     },[docs])
 
-    const { loggedIn } = useContext(PContext)
-
     const getRecentDocs = async () =>{
         var res = (await pDatabase.collection("posts").orderBy("dateWritten","desc").where("isFeatured","==",true).limit(batchSize).get()).docs;
         var arr = res.map(doc=>{return {...doc.data(),id:doc.id}});

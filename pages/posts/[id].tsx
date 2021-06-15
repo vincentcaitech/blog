@@ -4,7 +4,6 @@ import {pDatabase,pAuth} from "../../services/config";
 import { PContext } from "../../services/context";
 
 export default function SinglePost(props){
-    const { loggedIn }= useContext(PContext);
 
     return <Post 
         title={props.title} 
@@ -15,9 +14,9 @@ export default function SinglePost(props){
         imageURL={props.imageURL}
         topics={props.topics}
         body={props.body}
-        isEditor={loggedIn} //if logged in and can edit
         id={props.id}
         isFeatured={props.isFeatured}
+        //this component will find if it isAdmin
     />
 }
 

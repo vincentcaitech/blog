@@ -20,6 +20,9 @@ export default function Account(){
        }
        setLoading(false);
     }
+    const createAccount = async () =>{
+
+    }
     const logout = async () =>{
         setErrorMessage("")
         setLoading(true);
@@ -49,6 +52,7 @@ export default function Account(){
             <EditInput val={emailInput} set={setEmailInput} placeholder="Email"></EditInput>
             <EditInput type="password" val={passwordInput} set={setPasswordInput} placeholder={"Password"}></EditInput>
             <button className="sb" onClick={login}>Login</button>
+            <button className="gb" style={{marginLeft: "10px"}}onClick={createAccount}>Create Account</button>
         </div>:<div style={{marginBottom: "15px"}}>
             <div><EditInput val={usernameInput} set={setUsernameInput} placeholder={pAuth.currentUser.displayName}></EditInput><button className="sb" onClick={setUsername}>Change Username</button></div>
             <button className="sb" onClick={logout}>Logout</button>
