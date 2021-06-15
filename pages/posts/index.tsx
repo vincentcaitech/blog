@@ -25,7 +25,7 @@ export default function Posts(){
         console.log(docs);
     },[docs])
 
-    const { loggedIn }= useContext(PContext);
+    const { isAdmin }= useContext(PContext);
     
 
     const getRecentDocs = async () =>{
@@ -62,7 +62,7 @@ export default function Posts(){
 
     return <ListScaffold title="Recent Posts">
         {loading&&<Popup><Loading/></Popup> }
-        {loggedIn&&<button id="add-post" onClick={newPost}>New Post</button>}
+        {isAdmin&&<button id="add-post" onClick={newPost}>New Post</button>}
         <ul id="posts-list">
             {docs.map((post)=>{
                 return <li><PostPreview post={post}/></li>
