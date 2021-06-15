@@ -580,6 +580,13 @@ header{
   }
 }
 
+#about-body{
+  color: white;
+  width: 80vw;
+  margin: 0px auto 30vh auto;
+  font-size: 1.5em;
+}
+
 footer{
   @include center();
   color:white;

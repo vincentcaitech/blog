@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import ListScaffold from "../../components/ListScaffold"
 import { pAuth, pDatabase,fbFieldValue } from "../../services/config";
 import { getDateString } from "../../services/convert";
@@ -8,6 +8,7 @@ import Loading from "../../components/Loading"
 import { useRouter } from 'next/router'
 import { route } from "next/dist/next-server/server/router";
 import PostPreview from "../../components/PostPreview";
+import { PContext } from "../../services/context";
 
 export default function Posts(){
     const batchSize = 5;//five posts at a time;
@@ -24,12 +25,7 @@ export default function Posts(){
         console.log(docs);
     },[docs])
 
-    const [loggedIn,setLoggedIn] = useState(false);
-
-    pAuth.onAuthStateChanged((user)=>{
-        if(user) setLoggedIn(true);
-        else setLoggedIn(false);
-    })
+    const { loggedIn }= useContext(PContext);
     
 
     const getRecentDocs = async () =>{

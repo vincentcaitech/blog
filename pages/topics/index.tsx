@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import ListScaffold from "../../components/ListScaffold"
 import { pAuth, pDatabase,fbFieldValue } from "../../services/config";
 import { getDateString } from "../../services/convert";
 import Link from "next/link"
 import Popup from "../../components/Popup";
 import Loading from "../../components/Loading"
+import { PContext } from "../../services/context";
 
 
 export default function Topics(){
@@ -48,12 +49,7 @@ export default function Topics(){
     },[])
 
 
-    const [loggedIn,setLoggedIn] = useState(false);
-
-    pAuth.onAuthStateChanged((user)=>{
-        if(user) setLoggedIn(true);
-        else setLoggedIn(false);
-    })
+    const { loggedIn }= useContext(PContext);
     
 
     const getRecentDocs = async () =>{

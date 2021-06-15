@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { pAuth } from "../services/config";
 import EditInput from "../components/EditInput";
+import { PContext } from "../services/context";
 
 export default function Account(){
+    const { loggedIn }= useContext(PContext);
     const [emailInput,setEmailInput] = useState("");
     const [passwordInput,setPasswordInput] = useState("");
     const [errorMessage,setErrorMessage] = useState("");
     const [loading,setLoading] = useState(false);
-    const [loggedIn,setLoggedIn] = useState(false);
     const [usernameInput,setUsernameInput] = useState('');
     const login = async () => {
         setErrorMessage("")
@@ -42,13 +43,6 @@ export default function Account(){
         setLoading(false);
         setUsernameInput("");
     }
-
-    useEffect(()=>{
-        pAuth.onAuthStateChanged((user)=>{
-            if(user) setLoggedIn(true);
-            else setLoggedIn(false);
-        })
-    })
 
     return <div id="auth-container">
         <div id="auth-container-center">{!loggedIn?<div>

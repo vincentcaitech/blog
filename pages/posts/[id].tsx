@@ -1,15 +1,10 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Post from "../../components/Post";
 import {pDatabase,pAuth} from "../../services/config";
+import { PContext } from "../../services/context";
 
 export default function SinglePost(props){
-    const [loggedIn,setLoggedIn] = useState(false);
-
-    pAuth.onAuthStateChanged((user)=>{
-        if(user) setLoggedIn(true);
-        else setLoggedIn(false);
-    })
-
+    const { loggedIn }= useContext(PContext);
 
     return <Post 
         title={props.title} 
