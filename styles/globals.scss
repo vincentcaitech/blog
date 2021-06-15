@@ -535,10 +535,22 @@ header{
   height: 90vh;
   #auth-container-center{
     max-width: 90vw;
-    @include row();
-    flex-direction: column;
+    @include col();
     input{
       margin-right: 10px;
+      font-size: 1.3em;
+    }
+    .loggedIn{
+      @include col();
+      h2{
+        margin: 0px 0px 10vh 0px;
+      }
+      p{
+        margin-top: 3px;
+      }
+      .sb{
+        margin-top: 20px;
+      }
     }
     padding: 20px;
     background-color: white;

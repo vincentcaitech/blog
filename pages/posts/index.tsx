@@ -47,6 +47,7 @@ export default function Posts(){
                 body: "",
                 topics: [],
                 attachments: [],
+                comments: [],
                 isFeatured: false,
             })
             console.log(fbFieldValue);

@@ -150,6 +150,12 @@ export default function Post(props){
             <ul><li>Topics:</li>
                 {topics&&topics.map(topic=><li>{topic}{isEditor&&<button onClick={()=>setTopics(topics.filter(t=>t!=topic))}>X</button>}</li>)}</ul>
         </section>
+        {/* <section id="attachments">
+            <h6>Attachments</h6>
+        </section>
+        <section id="comments">
+            <h6>Comments</h6>
+        </section> */}
         <section id="explore-more">
             <h6>Explore More</h6>
             <ul id="other-posts">{otherPosts.map((post)=>{
