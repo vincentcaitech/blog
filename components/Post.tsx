@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useContext } from "react"
 import { getDateString } from "../services/convert"
 import dynamic from "next/dynamic";
 import 'draft-js/dist/Draft.css';
@@ -8,12 +8,13 @@ import EditInput from "./EditInput";
 import { fbFieldValue, pAuth, pDatabase, pStorage } from "../services/config";
 import Popup from "./Popup";
 import {useRouter} from "next/router";
+import { PContext } from "../services/context";
 
 
 
 export default function Post(props){
     const router = useRouter();
-    const [isEditor,setIsEditor] = useState(props.isEditor);
+    const isEditor = useContext(PContext)["isAdmin"]
     const [title,setTitle] = useState(props.title);
     const [subtitle,setSubtitle] = useState(props.subtitle);
     const [author,setAuthor] = useState(props.author);
@@ -22,6 +23,7 @@ export default function Post(props){
     const [body,setBody] = useState(props.body);
     const [topics,setTopics] = useState(props.topics)
     const [imageURL,setImageURL] = useState(props.imageURL);
+    const [isFeatured,setIsFeatured] = useState(props.isFeatured)
 
     const [togglePreview,setTogglePreview] = useState(false);
     const [topicInput,setTopicInput] = useState("");
@@ -31,17 +33,12 @@ export default function Post(props){
     const [deletePopup,setDeletePopup] = useState(false);
     const [deleteText,setDeleteText] = useState("");
 
-    pAuth.onAuthStateChanged((user)=>{
-        if(user) setIsEditor(true);
-        else setIsEditor(false);
-    })
-
 
     const save = async () => {
         setSaving(true);
         try{
             await pDatabase.collection("posts").doc(props.id).update({
-                title, subtitle, author, body,topics, imageURL, dateModified: (new Date()).getTime(),
+                title, subtitle, author, body,topics, imageURL, dateModified: (new Date()).getTime(), isFeatured
             })
         }catch(e){
             console.error(e);
@@ -95,7 +92,7 @@ export default function Post(props){
             })
             await pStorage.child("images").child(id).delete();
             setSaving(false);
-            router.push("/posts");
+            router.push("/");
         }catch(e){
             console.error(e);
             setSaving(false);
@@ -116,14 +113,18 @@ export default function Post(props){
                 <li>
                     <Link href="/recent"><a className="sb">Other Posts</a></Link>
                 </li>
-                <li>
+                {topics&&topics.length>0&&<li>
                     <Link href={`/topics/${topics[0]}`}><a className="sb">{topics[0]}</a></Link>
-                </li>
+                </li>}
                 <li>
                     <Link href="/about"><a className="sb">About</a></Link>
                 </li>
             </ul>
         </div>
+        <section id="isFeatured">
+            {isEditor?<button className={isFeatured?"featured":"notFeatured"} onClick={()=>setIsFeatured(!isFeatured)}>{isFeatured?"Featured ":"Not Featured"}</button>:
+            isFeatured&&<div className="featured">Featured</div>}
+        </section>
         <section id="jumbo-image" style={{backgroundImage: `url(${imageURL})`, backgroundSize: "cover"}}>
             {isEditor&&<div id="upload-jimage"><p>Upload A New Image</p><input type="file" onChange={uploadJumboImage}></input></div>}
         </section>
@@ -147,8 +148,14 @@ export default function Post(props){
                 }}>Add Topic</button>
             </div>}
             <ul><li>Topics:</li>
-                {topics.map(topic=><li>{topic}{isEditor&&<button onClick={()=>setTopics(topics.filter(t=>t!=topic))}>X</button>}</li>)}</ul>
+                {topics&&topics.map(topic=><li>{topic}{isEditor&&<button onClick={()=>setTopics(topics.filter(t=>t!=topic))}>X</button>}</li>)}</ul>
         </section>
+        {/* <section id="attachments">
+            <h6>Attachments</h6>
+        </section>
+        <section id="comments">
+            <h6>Comments</h6>
+        </section> */}
         <section id="explore-more">
             <h6>Explore More</h6>
             <ul id="other-posts">{otherPosts.map((post)=>{

@@ -9,15 +9,48 @@
   align-items: center;
 }
 
+@mixin col{
+  @include row();
+  flex-direction: column;
+}
+
 @mixin line{
   background-color: transparent;
   height: 0px;
   border-bottom: 3px solid white;
 }
 
+@mixin b-line{
+  background-color: transparent;
+  height: 0px;
+  border-bottom: 3px solid black;
+}
+
+@mixin hoverer1{
+  transition: all 0.3s;
+  &:hover{
+    opacity: 0.9;
+    transform: translate(-1%,-2%);
+  }
+}
+
+@mixin sbstyle{
+  padding: 5px 20px;
+  background-color: black;
+  color: white;
+  font-weight: 500;
+  transition: all 0.2s;
+  font-size: 18px;
+  &:hover{
+    opacity: 0.7;
+  }
+}
+
 :root{
   --primary-font: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
   Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  --blue: rgb(0, 68, 196);
+  --orange: rgb(255, 184, 77);
 }
 
 html,
@@ -42,28 +75,19 @@ a {
 }
 
 .sb{
-  padding: 5px 20px;
-  background-color: black;
-  color: white;
-  font-weight: 500;
-  transition: all 0.2s;
-  font-size: 18px;
-  &:hover{
-    opacity: 0.7;
-  }
+ @include sbstyle();
+}
+
+.gb{
+  @include sbstyle();
+  background-color: lightgray;
+  color: black;
+  border: none;
 }
 
 .rb{
-  padding: 5px 20px;
+  @include sbstyle();
   background-color: red;
-  border: none;
-  color: white;
-  font-weight: 500;
-  transition: all 0.2s;
-  font-size: 18px;
-  &:hover{
-    opacity: 0.7;
-  }
 }
 
 .si{
@@ -159,49 +183,56 @@ header{
   flex-direction: column;
   margin-top: 20vh;
   margin-bottom: 50vh;
-  #single-post{
-    margin-bottom: 10vh;
-    transition: all 0.3s;
-    &:hover{
-      opacity: 0.9;
-      transform: translate(-1%,-2%);
+}
+
+#single-post{
+  margin-bottom: 10vh;
+  @include hoverer1();
+  max-width: 1200px;
+  width: 90vw;
+  aspect-ratio: 5/2;
+  background-color: white;
+  color:black;
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  position: relative;
+  .post-image{
+    height: 100%;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+  }
+  .post-info{
+    padding: 5%;
+    h3{
+      font-size: 2.7vw;
+      margin: 0px;
     }
-    max-width: 1200px;
-    width: 90vw;
-    aspect-ratio: 5/2;
-    background-color: white;
-    color:black;
-    display: grid;
-    grid-template-columns: 2fr 3fr;
-    position: relative;
-    .post-image{
-      height: 100%;
-      width: 100%;
-      background-size: cover;
-      background-position: center;
+    p.subtitle{
+      font-size: 1vw;
+      margin: 5px 0px 15px 0px;
     }
-    .post-info{
-      padding: 5%;
-      h3{
-        font-size: 2.7vw;
-        margin: 0px;
-      }
-      p.subtitle{
-        font-size: 1vw;
-        margin: 5px 0px 15px 0px;
-      }
-      p.author{
-        margin: 0px;
-        font-weight: bold;
-      }
-      p.date{
-        position: absolute;
-        bottom: 0px;
-        right: 0px;
-        padding: 15px;
-        margin: 0px;
-        font-weight: bold;
-      }
+    p.author{
+      margin: 0px;
+      font-weight: bold;
+    }
+    p.featured{
+      margin: 10px auto 0px 0px;
+      width: 90px;
+      text-align: center;
+      padding: 3px 15px;
+      border-radius: 5px;
+      font-size: 16px;
+      background-color: var(--blue);
+      color: white;
+    }
+    p.date{
+      position: absolute;
+      bottom: 0px;
+      right: 0px;
+      padding: 15px;
+      margin: 0px;
+      font-weight: bold;
     }
   }
 }
@@ -271,6 +302,28 @@ header{
     }
   }
 
+  #isFeatured{
+    margin: 20px 0px 0px 20px;
+    button{
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      padding: 3px 20px;
+      transition: all 0.3s;
+      &:hover{
+        opacity: 0.7;
+      }
+    }
+    .featured{
+      background-color: var(--blue);
+      color: white;
+      display: inline;
+      border-radius: 5px;
+      font-size: 18px;
+      padding: 3px 20px;
+    }
+  }
+
   #jumbo-image{
     width: 80%;
     height: 30vw;
@@ -293,68 +346,7 @@ header{
     }
   }
 
-  #blog-text{
-    width: 100%;
-    margin: 0px auto;
-    #toggler{
-      button{
-        opacity: 0.7;
-        transition: all 0.2s;
-        font-size: 20px;
-        border: none;
-        margin-right: 10px;
-        padding: 5px 20px;
-        &:hover{
-          opacity: 1;
-        }
-        &.on{
-          opacity: 1;
-        }
-      }
-    }
-    #blog-body {
-      font-size: 1.5em;
-      textarea{
-        min-height: 100vh;
-        min-width: 100%;
-        max-width: 100%;
-        font-size: 1em;
-        width: 100%;
-        font-family: var(--primary-font);
-        padding: 15px;
-        margin-top: 30px;
-        border: 3px solid black;
-        border-radius: 5px;
-        background-color: rgb(241, 241, 241);
-        &:focus{
-          background-color: white;
-        }
-      }
-    }
-  }
 
-  #editor-space{
-    background-color: rgb(29, 156, 25);
-    border: none;
-    position: fixed;
-    bottom: 0px;
-    right: 0px;
-    h6{
-      font-size: 20px;
-      margin: 10px 40px;
-    }
-    button{
-      width: 100%;
-      padding: 10px;
-      font-size: 20px;
-      border: none;
-      border-radius: 0px;
-      transition: all 0.3s;
-      &:hover{
-        opacity: 0.7;
-      }
-    }
-  }
   #topics{
     margin-top: 20vh;
     #input-topic{
@@ -453,6 +445,71 @@ header{
   }
 }
 
+//For both blog post AND about page
+#blog-text{
+  width: 100%;
+  margin: 0px auto;
+  #toggler{
+    button{
+      opacity: 0.7;
+      transition: all 0.2s;
+      font-size: 20px;
+      border: none;
+      margin-right: 10px;
+      padding: 5px 20px;
+      &:hover{
+        opacity: 1;
+      }
+      &.on{
+        opacity: 1;
+      }
+    }
+  }
+  #blog-body {
+    font-size: 1.5em;
+    textarea{
+      min-height: 100vh;
+      min-width: 100%;
+      max-width: 100%;
+      font-size: 1em;
+      width: 100%;
+      font-family: var(--primary-font);
+      padding: 15px;
+      margin-top: 30px;
+      border: 3px solid black;
+      border-radius: 5px;
+      background-color: rgb(241, 241, 241);
+      &:focus{
+        background-color: white;
+        outline: none;
+      }
+    }
+  }
+}
+#editor-space{
+  background-color: rgb(29, 156, 25);
+  border: none;
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
+  h6{
+    font-size: 20px;
+    margin: 10px 40px;
+  }
+  button{
+    width: 100%;
+    padding: 10px;
+    font-size: 20px;
+    border: none;
+    border-radius: 0px;
+    transition: all 0.3s;
+    &:hover{
+      opacity: 0.7;
+    }
+  }
+}
+
+
 #add-post{
   background-color: green;
   position: fixed;
@@ -478,10 +535,22 @@ header{
   height: 90vh;
   #auth-container-center{
     max-width: 90vw;
-    @include row();
-    flex-direction: column;
+    @include col();
     input{
       margin-right: 10px;
+      font-size: 1.3em;
+    }
+    .loggedIn{
+      @include col();
+      h2{
+        margin: 0px 0px 10vh 0px;
+      }
+      p{
+        margin-top: 3px;
+      }
+      .sb{
+        margin-top: 20px;
+      }
     }
     padding: 20px;
     background-color: white;
@@ -489,7 +558,53 @@ header{
   }
 }
 
+#topics-list{
+  @include col();
+  li{
+    width: 80vw;
+    height: 25vw;
+    margin-bottom: 10vh;
+    background-position: center;
+    @include hoverer1();
+    .topic{
+      background-color: rgba(256,256,256,0.8);
+      padding: 20px 2vw;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      h3{
+        margin: 0px;
+        margin-left: 5%;
+        margin-top: 30px;
+        font-size: 3vw;
+      }
+      p.horiz-line{
+        @include b-line();
+        width: 60%;
+        transform: translateX(-10%);
+      }
+      p.vert-line{
+        height: 70%;
+        border-left: 3px solid black;
+        position: absolute;
+        top: 2%;
+        left: 5%;
+      }
+      p.description{
+        margin-left: 5%;
+        font-size: 1.7vw;
+        margin-right: 10%;
+      }
+    }
+  }
+}
 
+#about-body{
+  color: white;
+  width: 80vw;
+  margin: 0px auto 30vh auto;
+  font-size: 18px;
+}
 
 footer{
   @include center();

@@ -1,15 +1,9 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Post from "../../components/Post";
 import {pDatabase,pAuth} from "../../services/config";
+import { PContext } from "../../services/context";
 
 export default function SinglePost(props){
-    const [loggedIn,setLoggedIn] = useState(false);
-
-    pAuth.onAuthStateChanged((user)=>{
-        if(user) setLoggedIn(true);
-        else setLoggedIn(false);
-    })
-
 
     return <Post 
         title={props.title} 
@@ -20,8 +14,9 @@ export default function SinglePost(props){
         imageURL={props.imageURL}
         topics={props.topics}
         body={props.body}
-        isEditor={loggedIn} //if logged in and can edit
         id={props.id}
+        isFeatured={props.isFeatured}
+        //this component will find if it isAdmin
     />
 }
 

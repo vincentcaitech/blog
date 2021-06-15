@@ -1,15 +1,10 @@
 import Link from "next/link"
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { pAuth } from "../services/config"
+import { PContext } from "../services/context";
 
 export default function Header(){
-    const [loggedIn,setLoggedIn] = useState(false);
-
-    pAuth.onAuthStateChanged((user)=>{
-        if(user) setLoggedIn(true);
-        else setLoggedIn(false);
-    })
-
+    const { loggedIn }= useContext(PContext);
     return <header>
         <h1><Link href="/"><a>VC BLOG</a></Link></h1>
         <ul id="menu">

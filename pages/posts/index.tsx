@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import ListScaffold from "../../components/ListScaffold"
 import { pAuth, pDatabase,fbFieldValue } from "../../services/config";
 import { getDateString } from "../../services/convert";
@@ -7,6 +7,8 @@ import Popup from "../../components/Popup";
 import Loading from "../../components/Loading"
 import { useRouter } from 'next/router'
 import { route } from "next/dist/next-server/server/router";
+import PostPreview from "../../components/PostPreview";
+import { PContext } from "../../services/context";
 
 export default function Posts(){
     const batchSize = 5;//five posts at a time;
@@ -23,18 +25,12 @@ export default function Posts(){
         console.log(docs);
     },[docs])
 
-    const [loggedIn,setLoggedIn] = useState(false);
-
-    pAuth.onAuthStateChanged((user)=>{
-        if(user) setLoggedIn(true);
-        else setLoggedIn(false);
-    })
+    const { isAdmin }= useContext(PContext);
     
 
     const getRecentDocs = async () =>{
         var res = (await pDatabase.collection("posts").orderBy("dateWritten","desc").limit(batchSize).get()).docs;
         var arr = res.map(doc=>{return {...doc.data(),id:doc.id}});
-        console.log(arr);
         setDocs(arr);
     }
 
@@ -51,6 +47,7 @@ export default function Posts(){
                 body: "",
                 topics: [],
                 attachments: [],
+                comments: [],
                 isFeatured: false,
             })
             console.log(fbFieldValue);
@@ -66,19 +63,10 @@ export default function Posts(){
 
     return <ListScaffold title="Recent Posts">
         {loading&&<Popup><Loading/></Popup> }
-        {loggedIn&&<button id="add-post" onClick={newPost}>New Post</button>}
+        {isAdmin&&<button id="add-post" onClick={newPost}>New Post</button>}
         <ul id="posts-list">
             {docs.map((post)=>{
-                return <li><Link href={`/posts/${post.id}`}><a id="single-post">
-                    <div className="post-image" style={{backgroundImage: `url(${post.imageURL})`}}></div>
-                    <div className="post-info">
-                        <h3>{post.title}</h3>
-                        <p className="subtitle">{post.subtitle}</p>
-                        <p className="author">By {post.author}</p>
-                        <p className="date">{getDateString(post.dateWritten)}</p>
-                    </div>
-                </a>
-                </Link></li>
+                return <li><PostPreview post={post}/></li>
             })}
         </ul>
     </ListScaffold>
