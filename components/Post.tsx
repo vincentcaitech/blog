@@ -10,6 +10,7 @@ import Popup from "./Popup";
 import {useRouter} from "next/router";
 import { PContext } from "../services/context";
 import CommentInput from "./CommentInput";
+import imageCompression from 'browser-image-compression';
 
 
 
@@ -65,7 +66,12 @@ export default function Post(props){
     const uploadJumboImage = async (e) => {
         setUploading(true);
         try{
-            const res = await pStorage.child("images").child(props.id).put(e.target.files[0]);
+            const imageFile = e.target.files[0];
+            const options = {
+                maxSizeMB: 1,
+            }
+            const compressedFile = await imageCompression(imageFile, options);
+            const res = await pStorage.child("images").child(props.id).put(compressedFile);
             const url:string = await res.ref.getDownloadURL();
             setImageURL(url);
         }catch(e){
@@ -284,7 +290,7 @@ export default function Post(props){
             </div>
             <ul>
                 <li>
-                    <Link href="/recent"><a className="sb">Other Posts</a></Link>
+                    <Link href="/posts"><a className="sb">Other Posts</a></Link>
                 </li>
                 {topics&&topics.length>0&&<li>
                     <Link href={`/topics/${topics[0]}`}><a className="sb">{topics[0]}</a></Link>
@@ -378,6 +384,7 @@ export default function Post(props){
                 </li>
             })}
             {lastComment!=-1&&<button className="get-more-comments" onClick={()=>getComments()}>+ Get More Comments</button>}
+            {comments.length==0&&<div className="no-comments-text">No Comments Yet</div>}
             </ul>
             
         </section>
