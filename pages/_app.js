@@ -8,6 +8,7 @@ import {pAuth, pDatabase } from "../services/config";
 
 function MyApp({ Component, pageProps }) {
   const [batchSize,setBatchSize] = useState(5);
+  const commentBatchSize = 5;
   const [loggedIn,setLoggedIn] = useState(false);
   const [admins,setAdmins] = useState([]);
   const [isAdmin,setIsAdmin] = useState(loggedIn);
@@ -38,6 +39,7 @@ function MyApp({ Component, pageProps }) {
     loggedIn,
     setLoggedIn,
     isAdmin,
+    commentBatchSize,
   };
   return  <PContext.Provider value={contextObj}>
     <CustomHead/>
