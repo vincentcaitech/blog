@@ -34,6 +34,14 @@
   }
 }
 
+@mixin hoverer2{
+  transition: all 0.2s;
+  opacity: 0.7;
+  &:hover{
+    opacity: 1;
+  }
+}
+
 @mixin sbstyle{
   padding: 5px 20px;
   background-color: black;
@@ -43,6 +51,12 @@
   font-size: 18px;
   &:hover{
     opacity: 0.7;
+  }
+}
+
+@mixin nooutline{
+  &:focus{
+    outline: none;
   }
 }
 
@@ -89,6 +103,7 @@ a {
   @include sbstyle();
   background-color: red;
 }
+
 
 .si{
   background-color: transparent;
@@ -595,6 +610,130 @@ header{
         font-size: 1.7vw;
         margin-right: 10%;
       }
+    }
+  }
+}
+
+#comments{
+  margin: 20vh 0px;
+  h6{
+    font-size: 30px;
+    margin: 0px;
+  }
+  .add-comment-section{
+    margin: 15px 0px;
+    padding: 5px 10px;
+    border-radius: 10px;
+    background-color: lightgrey;
+    h6{
+      font-size: 16px;
+      margin: 0px;
+    }
+    input{
+      font-family: var(--primary-font);
+      display: block;
+      margin: 10px 0px;
+      border: none;
+      font-size: 12px;
+      border-radius: 5px;
+      padding: 3px 5px;
+      font-weight: bold;
+      &:focus{
+        outline: none;
+      }
+    }
+    textarea{
+      font-family: var(--primary-font);
+      max-width: 100%;
+      min-width: 100%;
+      padding: 5px 10px;
+      border-radius: 5px;
+      max-height: 40px;
+      min-height: 40px;
+      font-size: 16px;
+      &:focus{
+        outline: none;
+      }
+    }
+  }
+  .login-to-comment{
+    margin: 0px;
+    margin-bottom: 5vh;
+    font-size: 12px;
+  }
+  ul{
+    list-style: none;
+    padding: 0px;
+    li{
+      margin: 30px 0px;
+      .comment-first-row{
+        @include row();
+        font-size: 12px;
+        margin-bottom: 5px;
+        .comment-username{
+          font-weight: bold;
+          font-weight: 14px;
+        }
+        .comment-dateAdded{
+          margin: 0px 10px;
+        }
+        button{
+          background-color: transparent;
+          padding: 0px;
+          color: red;
+          font-weight: bold;
+          border: none;
+          @include hoverer2();
+        }
+      }
+      .comment-text{
+        font-size: 18px;
+        font-weight: 100;
+      }
+      .replies{
+        margin-left: 20px;
+        .write-reply button{
+            background-color: transparent;
+            border: none;
+            @include nooutline();
+            color: var(--blue);
+            font-weight: bold;
+            opacity: 0.7;
+            margin: 10px 0px;
+            transition: all 0.2s;
+            padding: 0px;
+            &:hover{
+              opacity: 1;
+            }
+          }
+        li{
+          margin: 0px;
+          margin-bottom: 20px;
+        }
+      }
+      
+    }
+  }
+  .get-more-comments{
+    color: rgb(95, 95, 95);
+    font-weight: bolder;
+    padding: 0px;
+    background-color: transparent;
+    border: none;
+    @include hoverer2();
+  }
+}
+
+.delete-comment-popup{
+  h6{
+    font-size: 18px;
+    margin: 0px;
+    margin-bottom: 10px;
+  }
+  div{
+    @include row();
+    .rb{
+      margin-right: 10px;
     }
   }
 }
