@@ -61,7 +61,7 @@ export default function Account(){
 
     return <div id="auth-container">
         <div id="auth-container-center">
-            {!loggedIn?<div>
+            {!loggedIn?<div className="login">
                 <EditInput val={emailInput} set={setEmailInput} placeholder="Email"></EditInput>
                 <EditInput type="password" val={passwordInput} set={setPasswordInput} placeholder={"Password"}></EditInput>
                 <button className="sb" onClick={login}>Login</button>

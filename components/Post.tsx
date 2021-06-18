@@ -355,10 +355,10 @@ export default function Post(props){
                     <div className="comment-text">{c.text}</div>  
                     <ul className="replies">
                         <div className="write-reply">
-                            <button onClick={()=>{
+                            {context.loggedIn?<button onClick={()=>{
                                 setWriteReplyPopup(writeReplyPopup==c.id?null:c.id);
                                 setCommentText("");
-                            }}>{writeReplyPopup==c.id?"Hide":"Write a Reply"}</button>
+                            }}>{writeReplyPopup==c.id?"Hide":"Write a Reply"}</button>:<div style={{height: "20px"}}></div>}
                         </div>
                         {writeReplyPopup==c.id&&<CommentInput 
                             isReply={true}
