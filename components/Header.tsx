@@ -4,29 +4,34 @@ import { pAuth } from "../services/config"
 import { PContext } from "../services/context";
 
 export default function Header(){
-    const { loggedIn }= useContext(PContext);
+    const { loggedIn,isMobile }= useContext(PContext);
+    const [showMenu,setShowMenu] = useState(true);
+
     return <header>
         <h1><Link href="/"><a>VC BLOG</a></Link></h1>
-        <ul id="menu">
-            <li>
-                <Link href="/posts"><a>Recent</a></Link>
-            </li>
-            <li>
-                <Link href="/featured"><a>Featured</a></Link>
-            </li>
-            <li>
-                <Link href="/topics"><a>Topics</a></Link>
-            </li>
-            <li>
-                <Link href="/about"><a>About</a></Link>
-            </li>
-        </ul>
-        <div className="account-container">
-            <Link href="/account">
-                <a className="account-section"><div className="usericon"></div>
-                <span>{loggedIn&&pAuth.currentUser?pAuth.currentUser.displayName||pAuth.currentUser.email:"Account"}</span>
-                </a>
-            </Link>
-        </div>
+        <button className="menu-button" onClick={()=>setShowMenu(!showMenu)}>{showMenu?"Hide":"Menu"}</button>
+        {(!isMobile||showMenu)&&<div id="dropdown-container">
+            <ul id="menu">
+                <li>
+                    <Link href="/posts"><a>Recent</a></Link>
+                </li>
+                <li>
+                    <Link href="/featured"><a>Featured</a></Link>
+                </li>
+                <li>
+                    <Link href="/topics"><a>Topics</a></Link>
+                </li>
+                <li>
+                    <Link href="/about"><a>About</a></Link>
+                </li>
+            </ul>
+            <div className="account-container">
+                <Link href="/account">
+                    <a className="account-section"><div className="usericon"></div>
+                    <span>{loggedIn&&pAuth.currentUser?pAuth.currentUser.displayName||pAuth.currentUser.email:"Account"}</span>
+                    </a>
+                </Link>
+            </div>
+        </div>}
     </header>
 }

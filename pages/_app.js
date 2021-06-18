@@ -12,6 +12,7 @@ function MyApp({ Component, pageProps }) {
   const [loggedIn,setLoggedIn] = useState(false);
   const [admins,setAdmins] = useState([]);
   const [isAdmin,setIsAdmin] = useState(loggedIn);
+  const [isMobile,setIsMobile] = useState(false);
   pAuth.onAuthStateChanged((user)=>{
     if(user) {
       setLoggedIn(true)
@@ -22,6 +23,7 @@ function MyApp({ Component, pageProps }) {
 
   useEffect(()=>{
     getAdmins();
+    if(window.innerWidth<576) setIsMobile(true)
   },[])
 
   const getAdmins = async () =>{
@@ -40,6 +42,7 @@ function MyApp({ Component, pageProps }) {
     setLoggedIn,
     isAdmin,
     commentBatchSize,
+    isMobile
   };
   return  <PContext.Provider value={contextObj}>
     <CustomHead/>

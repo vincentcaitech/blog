@@ -10,6 +10,7 @@ import Popup from "./Popup";
 import {useRouter} from "next/router";
 import { PContext } from "../services/context";
 import CommentInput from "./CommentInput";
+import imageCompression from 'browser-image-compression';
 
 
 
@@ -65,7 +66,12 @@ export default function Post(props){
     const uploadJumboImage = async (e) => {
         setUploading(true);
         try{
-            const res = await pStorage.child("images").child(props.id).put(e.target.files[0]);
+            const imageFile = e.target.files[0];
+            const options = {
+                maxSizeMB: 1,
+            }
+            const compressedFile = await imageCompression(imageFile, options);
+            const res = await pStorage.child("images").child(props.id).put(compressedFile);
             const url:string = await res.ref.getDownloadURL();
             setImageURL(url);
         }catch(e){
@@ -74,14 +80,30 @@ export default function Post(props){
         setUploading(false);
     }
 
-    useEffect(()=>{
+    //When getting a new post;
+    useEffect(()=>{   
+        //Reset all the blog post's properties
+        setTitle(props.title);
+        setSubtitle(props.subtitle);
+        setAuthor(props.author);
+        setDateWritten(props.dateWritten);
+        setDateModified(props.dateModified);
+        setBody(props.body);
+        setTopics(props.topics)
+        setImageURL(props.imageURL);
+        setIsFeatured(props.isFeatured)
+        //Then reset these values;
+        setLastComment(null);
+        setLastReply({})
+        setComments([]);
+        //Then call these functions: 
         getRandomDocs();
-        getComments();
-    },[])
+        getComments(true);
+    },[props.id])
 
     const getRandomDocs = async () =>{
         var allDocs:string[] = (await pDatabase.collection("posts").doc("data").get()).data()["ids"];
-        //allDocs = allDocs.filter((id)=>id!=props.id);
+        allDocs = allDocs.filter((id)=>id!=props.id);
         var arr:string[] = [];
         for(var i = 0 ;i<3;i++){//three random docs.
             var index = Math.floor(Math.random()*allDocs.length)
@@ -89,6 +111,7 @@ export default function Post(props){
             allDocs.splice(index,1);
         }
         var res = [];
+        console.log(arr);
         
         //Now get the data on these three docs.
         res[0] = {...(await pDatabase.collection("posts").doc(arr[0]).get()).data(), id: arr[0]};
@@ -97,14 +120,14 @@ export default function Post(props){
         setOtherPosts(res);
     }
 
-    const getComments = async () =>{
+    const getComments = async (isRefresh) =>{
         console.log("getting comments");
         var postRef = pDatabase.collection("posts").doc(props.id);
         try{
             //Get all main comments (non-replies)
             var query = postRef.collection("comments").where("replyTo","==",null).limit(commentBatchSize);
-            if(lastComment==-1) return;
-            if(lastComment!=null) query = query.startAfter(lastComment);
+            if(lastComment==-1&&!isRefresh) return;
+            if(lastComment!=null&&!isRefresh) query = query.startAfter(lastComment);
             var res = (await query.get()).docs;
             var arr = res.map(c=>{return {...c.data(),replies:[],id: c.id}});
             console.log(res);
@@ -131,7 +154,8 @@ export default function Post(props){
             setLastReply({...lastReply,...newObj}); //combining lastReplys of all previous comments and theses new ones;
             setLastComment(res.length<commentBatchSize?-1:res[res.length-1]);
             console.log(arr);
-            setComments([...comments,...arr]);
+            if(!isRefresh) setComments([...comments,...arr]);
+            else setComments([...arr]); //don't keep previous comments if a refresh for a new post
         }catch(e){
             console.error(e);
         }
@@ -284,7 +308,7 @@ export default function Post(props){
             </div>
             <ul>
                 <li>
-                    <Link href="/recent"><a className="sb">Other Posts</a></Link>
+                    <Link href="/posts"><a className="sb">Other Posts</a></Link>
                 </li>
                 {topics&&topics.length>0&&<li>
                     <Link href={`/topics/${topics[0]}`}><a className="sb">{topics[0]}</a></Link>
@@ -349,10 +373,10 @@ export default function Post(props){
                     <div className="comment-text">{c.text}</div>  
                     <ul className="replies">
                         <div className="write-reply">
-                            <button onClick={()=>{
+                            {context.loggedIn?<button onClick={()=>{
                                 setWriteReplyPopup(writeReplyPopup==c.id?null:c.id);
                                 setCommentText("");
-                            }}>{writeReplyPopup==c.id?"Hide":"Write a Reply"}</button>
+                            }}>{writeReplyPopup==c.id?"Hide":"Write a Reply"}</button>:<div style={{height: "20px"}}></div>}
                         </div>
                         {writeReplyPopup==c.id&&<CommentInput 
                             isReply={true}
@@ -377,7 +401,8 @@ export default function Post(props){
                     </ul>
                 </li>
             })}
-            {lastComment!=-1&&<button className="get-more-comments" onClick={()=>getComments()}>+ Get More Comments</button>}
+            {lastComment!=-1&&<button className="get-more-comments" onClick={()=>getComments(false)}>+ Get More Comments</button>}
+            {comments.length==0&&<div className="no-comments-text">No Comments Yet</div>}
             </ul>
             
         </section>
