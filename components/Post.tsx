@@ -28,6 +28,7 @@ export default function Post(props){
     const [topics,setTopics] = useState(props.topics)
     const [imageURL,setImageURL] = useState(props.imageURL);
     const [isFeatured,setIsFeatured] = useState(props.isFeatured)
+    const [isPrivate,setIsPrivate] = useState(props.isPrivate);
 
     const [togglePreview,setTogglePreview] = useState(false);
     const [topicInput,setTopicInput] = useState("");
@@ -95,7 +96,8 @@ export default function Post(props){
         setBody(props.body);
         setTopics(props.topics)
         setImageURL(props.imageURL);
-        setIsFeatured(props.isFeatured)
+        setIsFeatured(props.isFeatured);
+        setIsPrivate(props.isPrivate);
         //Then reset these values;
         setLastComment(null);
         setLastReply({})

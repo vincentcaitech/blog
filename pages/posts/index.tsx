@@ -49,6 +49,7 @@ export default function Posts(){
                 attachments: [],
                 comments: [],
                 isFeatured: false,
+                isPrivate: true,
             })
             console.log(fbFieldValue);
             await pDatabase.collection("posts").doc("data").update({

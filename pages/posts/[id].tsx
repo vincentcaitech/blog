@@ -16,6 +16,7 @@ export default function SinglePost(props){
         body={props.body}
         id={props.id}
         isFeatured={props.isFeatured}
+        isPrivate={props.isPrivate}
         //this component will find if it isAdmin
     />
 }
