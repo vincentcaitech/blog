@@ -205,6 +205,7 @@ export default function Post(props){
     const deletePost = async () =>{
         setSaving(true);
         const id:string = props.id;
+        const hasImage:boolean = !(props.imageURL==""||props.imageURL==undefined);
         try{
             //Delete the post document
             await pDatabase.collection("posts").doc(id).delete();
@@ -213,7 +214,7 @@ export default function Post(props){
                 ids: fbFieldValue.arrayRemove(id)
             })
             //Delete the jumbo image from storage
-            await pStorage.child("images").child(id).delete();
+            if(hasImage) await pStorage.child("images").child(id).delete();
             //Delete all comments in collection
             var comments = await pDatabase.collection("posts").doc(id).collection("comments").get();
             var batch = pDatabase.batch();
@@ -222,7 +223,7 @@ export default function Post(props){
             })
             await batch.commit();
             setSaving(false);
-            router.push("/");
+            router.push("/posts");
         }catch(e){
             console.error(e);
             setSaving(false);
