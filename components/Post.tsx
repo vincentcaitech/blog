@@ -60,7 +60,7 @@ export default function Post(props){
         setSaving(true);
         try{
             await pDatabase.collection("posts").doc(props.id).update({
-                title, subtitle, author, body,topics, imageURL, dateModified: (new Date()).getTime(), isFeatured,
+                title, subtitle, author, body,topics, imageURL, dateModified: (new Date()).getTime(), isFeatured, isPrivate
             })
         }catch(e){
             console.error(e);
