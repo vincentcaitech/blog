@@ -4,7 +4,7 @@ import { pAuth } from "../services/config"
 import { PContext } from "../services/context";
 
 export default function Header(){
-    const { loggedIn,isMobile }= useContext(PContext);
+    const { loggedIn,isMobile,isAdmin }= useContext(PContext);
     const [showMenu,setShowMenu] = useState(false);
 
     return <header>
@@ -24,6 +24,9 @@ export default function Header(){
                 <li>
                     <Link href="/about"><a>About</a></Link>
                 </li>
+                {isAdmin&&<li>
+                    <Link href="/private"><a>Private</a></Link>
+                </li>}
             </ul>
             <div className="account-container">
                 <Link href="/account">

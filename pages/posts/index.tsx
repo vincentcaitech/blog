@@ -11,7 +11,6 @@ import PostPreview from "../../components/PostPreview";
 import { PContext } from "../../services/context";
 
 export default function Posts(){
-    const batchSize = 5;//five posts at a time;
     const router = useRouter();
 
     const [docs,setDocs] = useState([]);
@@ -25,7 +24,7 @@ export default function Posts(){
         console.log(docs);
     },[docs])
 
-    const { isAdmin }= useContext(PContext);
+    const { isAdmin, batchSize }= useContext(PContext);
     
 
     const getRecentDocs = async () =>{

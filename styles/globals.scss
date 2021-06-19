@@ -993,6 +993,13 @@ header{
   font-size: 18px;
 }
 
+#private-no-access{
+  width: 100%;
+  height: 90vh;
+  @include center();
+  color: white;
+}
+
 footer{
   @include center();
   color:white;

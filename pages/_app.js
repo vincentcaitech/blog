@@ -8,7 +8,7 @@ import {pAuth, pDatabase } from "../services/config";
 
 function MyApp({ Component, pageProps }) {
   const [batchSize,setBatchSize] = useState(5);
-  const commentBatchSize = 5;
+  const commentBatchSize = 5; //document getting varies with n^2, because this is batch size for both main comments and replies
   const [loggedIn,setLoggedIn] = useState(false);
   const [admins,setAdmins] = useState([]);
   const [isAdmin,setIsAdmin] = useState(loggedIn);
@@ -18,7 +18,10 @@ function MyApp({ Component, pageProps }) {
       setLoggedIn(true)
       if(admins.includes(user.uid)) setIsAdmin(true);
       else setIsAdmin(false);
-    }else setLoggedIn(false);
+    }else {
+      setLoggedIn(false);
+      setIsAdmin(false);
+    }
   })
 
   useEffect(()=>{
