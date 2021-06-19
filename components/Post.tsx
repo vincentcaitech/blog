@@ -17,7 +17,7 @@ import imageCompression from 'browser-image-compression';
 export default function Post(props){
     const router = useRouter();
     const context = useContext(PContext);
-    const isEditor = context["isAdmin"]
+    const [isEditor,setIsEditor] = useState(context["isAdmin"]);
     const commentBatchSize = context["commentBatchSize"];
     const [title,setTitle] = useState(props.title);
     const [subtitle,setSubtitle] = useState(props.subtitle);
@@ -50,6 +50,10 @@ export default function Post(props){
     useEffect(()=>{
         if(context.loggedIn) setCommentUsername(pAuth.currentUser.displayName);
     },[context.loggedIn])
+
+    useEffect(()=>{
+        setIsEditor(context["isAdmin"]);
+    },[context["isAdmin"]])
 
     const save = async () => {
         setSaving(true);

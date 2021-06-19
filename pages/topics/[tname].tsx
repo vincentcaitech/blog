@@ -19,7 +19,7 @@ export default function Topic(props){
 
 
     const getDocs = async () =>{
-        var res = (await pDatabase.collection("posts").orderBy("dateWritten","desc").where("topics","array-contains",topic).limit(batchSize).get()).docs;
+        var res = (await pDatabase.collection("posts").orderBy("dateWritten","desc").where("isPrivate","==",false).where("topics","array-contains",topic).limit(batchSize).get()).docs;
         var arr = res.map(doc=>{return {...doc.data(),id:doc.id}});
         console.log(arr);
         setDocs(arr);

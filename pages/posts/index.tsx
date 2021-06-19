@@ -29,7 +29,7 @@ export default function Posts(){
     
 
     const getRecentDocs = async () =>{
-        var res = (await pDatabase.collection("posts").orderBy("dateWritten","desc").limit(batchSize).get()).docs;
+        var res = (await pDatabase.collection("posts").where("isPrivate","==",false).orderBy("dateWritten","desc").limit(batchSize).get()).docs;
         var arr = res.map(doc=>{return {...doc.data(),id:doc.id}});
         setDocs(arr);
     }
