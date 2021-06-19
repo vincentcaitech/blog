@@ -206,11 +206,21 @@ export default function Post(props){
         setSaving(true);
         const id:string = props.id;
         try{
+            //Delete the post document
             await pDatabase.collection("posts").doc(id).delete();
+            //Delete the id from the list of ids
             await pDatabase.collection("posts").doc('data').update({
                 ids: fbFieldValue.arrayRemove(id)
             })
+            //Delete the jumbo image from storage
             await pStorage.child("images").child(id).delete();
+            //Delete all comments in collection
+            var comments = await pDatabase.collection("posts").doc(id).collection("comments").get();
+            var batch = pDatabase.batch();
+            comments.docs.forEach(doc=>{
+                batch.delete(doc.ref);
+            })
+            await batch.commit();
             setSaving(false);
             router.push("/");
         }catch(e){
