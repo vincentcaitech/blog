@@ -5,7 +5,7 @@ import { PContext } from "../services/context";
 
 export default function Header(){
     const { loggedIn,isMobile }= useContext(PContext);
-    const [showMenu,setShowMenu] = useState(true);
+    const [showMenu,setShowMenu] = useState(false);
 
     return <header>
         <h1><Link href="/"><a>VC BLOG</a></Link></h1>
