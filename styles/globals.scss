@@ -564,6 +564,18 @@ header{
       }
     }
   }
+
+  #unsaved-warning{
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    background-color: red;
+    color: yellow;
+    text-align: center;
+    font-weight: bold;
+    padding: 2px 0px;
+  }
 }
 
 

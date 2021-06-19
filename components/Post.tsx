@@ -30,6 +30,8 @@ export default function Post(props){
     const [isFeatured,setIsFeatured] = useState(props.isFeatured)
     const [isPrivate,setIsPrivate] = useState(props.isPrivate);
 
+    const [edits,setEdits] = useState<number>(0);
+
     const [togglePreview,setTogglePreview] = useState(false);
     const [topicInput,setTopicInput] = useState("");
     const [saving,setSaving] = useState(false);
@@ -56,6 +58,11 @@ export default function Post(props){
         setIsEditor(context["isAdmin"]);
     },[context["isAdmin"]])
 
+    //When an editable field is changed
+    useEffect(()=>{
+        setEdits(edits+1);
+    },[title, subtitle, author, body,topics, imageURL, isFeatured, isPrivate])
+
     const save = async () => {
         setSaving(true);
         try{
@@ -66,6 +73,7 @@ export default function Post(props){
             console.error(e);
         }
         setSaving(false);
+        setEdits(0);
     }
 
     const uploadJumboImage = async (e) => {
@@ -449,8 +457,10 @@ export default function Post(props){
 
         {isEditor&&<div id="editor-space">
             <h6>Editing Mode</h6>
-            <button onClick={save} id="save-button">Publish</button>    
+            {edits>1&&<button onClick={save} id="save-button">Publish</button>} 
         </div>}
+
+        {isEditor&&edits>1&&<div id="unsaved-warning">WARNING: UNSAVED CHANGES</div>}
 
         {deletePopup&&<Popup><div>
                 <div>Type "confirm" to confirm deletion</div>
