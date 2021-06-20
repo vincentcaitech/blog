@@ -20,10 +20,6 @@ export default function Posts(){
         getRecentDocs();
     },[])
 
-    useEffect(()=>{
-        console.log(docs);
-    },[docs])
-
     const { isAdmin, batchSize }= useContext(PContext);
     
 
@@ -50,7 +46,6 @@ export default function Posts(){
                 isFeatured: false,
                 isPrivate: true,
             })
-            console.log(fbFieldValue);
             await pDatabase.collection("posts").doc("data").update({
                 ids: fbFieldValue.arrayUnion(res.id),
             })
@@ -66,7 +61,7 @@ export default function Posts(){
         {isAdmin&&<button id="add-post" onClick={newPost}>New Post</button>}
         <ul id="posts-list">
             {docs.map((post)=>{
-                return <li><PostPreview post={post}/></li>
+                return <li key={post.id}><PostPreview post={post}/></li>
             })}
         </ul>
     </ListScaffold>

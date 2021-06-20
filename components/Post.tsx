@@ -113,29 +113,31 @@ export default function Post(props){
         //Then call these functions: 
         getRandomDocs();
         getComments(true);
-    },[props.id])
+
+        setEdits(0); //do this for insurance, especially for loading a private doc, because this would be it's 2nd edit.
+    },[props.id,props.isPrivate]) //need props.title or one of the properties for a client side loading of a private doc.
 
     const getRandomDocs = async () =>{
         var allDocs:string[] = (await pDatabase.collection("posts").doc("data").get()).data()["ids"];
         allDocs = allDocs.filter((id)=>id!=props.id);
         var arr:string[] = [];
+        var res= [];
         for(var i = 0 ;i<3;i++){//three random docs.
-            var index = Math.floor(Math.random()*allDocs.length)
-            arr.push(allDocs[index]);
+            var index = Math.floor(Math.random()*allDocs.length);
+            if(allDocs.length==0) break;
+            try{
+                var query = await pDatabase.collection("posts").doc(allDocs[index]).get();
+                
+                res.push({...query.data(),id: query.id});
+            }catch(e){
+                i--;
+            }
             allDocs.splice(index,1);
         }
-        var res = [];
-        console.log(arr);
-        
-        //Now get the data on these three docs.
-        res[0] = {...(await pDatabase.collection("posts").doc(arr[0]).get()).data(), id: arr[0]};
-        res[1] = {...(await pDatabase.collection("posts").doc(arr[1]).get()).data(), id: arr[1]};
-        res[2] = {...(await pDatabase.collection("posts").doc(arr[2]).get()).data(), id: arr[2]};
         setOtherPosts(res);
     }
 
     const getComments = async (isRefresh) =>{
-        console.log("getting comments");
         var postRef = pDatabase.collection("posts").doc(props.id);
         try{
             //Get all main comments (non-replies)
@@ -144,7 +146,6 @@ export default function Post(props){
             if(lastComment!=null&&!isRefresh) query = query.startAfter(lastComment);
             var res = (await query.get()).docs;
             var arr = res.map(c=>{return {...c.data(),replies:[],id: c.id}});
-            console.log(res);
 
             //Then get replies for each comment
             var repliesQuery = res.map(c=>{
@@ -152,8 +153,6 @@ export default function Post(props){
             });
             
             var allReplies = (await Promise.all(repliesQuery)).map(replies=>{return replies.docs;});
-            console.log(allReplies);
-
             //Then assign replies to corresponding comment;
             var i = 0;  //index of reply list matches index of the main comment they replied to.
             var newObj = {}; //for mapping of post id to last reply (for pagination)
@@ -167,7 +166,6 @@ export default function Post(props){
             })
             setLastReply({...lastReply,...newObj}); //combining lastReplys of all previous comments and theses new ones;
             setLastComment(res.length<commentBatchSize?-1:res[res.length-1]);
-            console.log(arr);
             if(!isRefresh) setComments([...comments,...arr]);
             else setComments([...arr]); //don't keep previous comments if a refresh for a new post
         }catch(e){
@@ -183,7 +181,6 @@ export default function Post(props){
            setLastReply(newObj); 
         }
         try{
-            console.log(lastReply[commentId]);
             if(!lastReply[commentId]) return;
             var res = (await pDatabase
                 .collection("posts")
@@ -196,19 +193,16 @@ export default function Post(props){
                 .get())
             //find index of the comment where the replies are to
             var index = findCommentIndex(commentId);
-            console.log(index);
             if(index==-1) return;
             var arr = [...comments];
             //then update the replies in comments
             res.docs.forEach(reply =>{
-                console.log(reply);
                 arr[index]["replies"].push({...reply.data(),id: reply.id});
             })
             setComments(arr);
             //set lastReply for this comment thread
             var newObj = {...lastReply};
             newObj[commentId] = res.docs.length<commentBatchSize?-1:res.docs[res.docs.length-1];
-            console.log(newObj[commentId],res.docs.length)
             
             setLastReply(newObj);
         }catch(e){
@@ -318,10 +312,6 @@ export default function Post(props){
         return index;
     }
 
-    useEffect(()=>{
-        console.log(lastComment);
-    },[lastComment])
-
     return <div id="post">
         <div id="title-section"><h2 id="post-title">{isEditor?<EditInput placeholder="Title" set={setTitle} val={title}></EditInput>:title}</h2>
         <p id="post-subtitle">{isEditor?<EditInput placeholder="Subtitle" set={setSubtitle} val={subtitle}></EditInput>:subtitle}</p>
@@ -332,13 +322,13 @@ export default function Post(props){
                 <p id="post-author">By {isEditor?<EditInput placeholder="Author" set={setAuthor} val={author}></EditInput>:author}</p>
             </div>
             <ul>
-                <li>
+                <li key="posts">
                     <Link href="/posts"><a className="sb">Other Posts</a></Link>
                 </li>
-                {topics&&topics.length>0&&<li>
+                {topics&&topics.length>0&&<li key="topic">
                     <Link href={`/topics/${topics[0]}`}><a className="sb">{topics[0]}</a></Link>
                 </li>}
-                <li>
+                <li key="about">
                     <Link href="/about"><a className="sb">About</a></Link>
                 </li>
             </ul>
@@ -372,8 +362,8 @@ export default function Post(props){
                     setTopics(arr);
                 }}>Add Topic</button>
             </div>}
-            <ul><li>Topics:</li>
-                {topics&&topics.map(topic=><li>{topic}{isEditor&&<button onClick={()=>setTopics(topics.filter(t=>t!=topic))}>X</button>}</li>)}</ul>
+            <ul><li key="topics">Topics:</li>
+                {topics&&topics.map(topic=><li key={topic}>{topic}{isEditor&&<button onClick={()=>setTopics(topics.filter(t=>t!=topic))}>X</button>}</li>)}</ul>
         </section>
         {/* <section id="attachments">
             <h6>Attachments</h6>
@@ -391,7 +381,7 @@ export default function Post(props){
                 Log in to Comment
             </div>}
             <ul>{comments.sort((a,b)=>b.dateAdded-a.dateAdded).map(c=>{
-                return <li>
+                return <li key={c.id}>
                     <div className="comment-first-row">
                         <div className="comment-username">{c.username}</div>
                         <span className="comment-dateAdded">{getDateString(c.dateAdded)}</span>
@@ -415,7 +405,7 @@ export default function Post(props){
                             post={()=>postComment(c.id)} 
                         />}
                         {c.replies&&c.replies.sort((a,b)=>a.dateAdded-b.dateAdded).map(r=>{
-                            return <li>
+                            return <li key={r.id}>
                                 <div className="comment-first-row">
                                     <div className="comment-username">{r.username}</div>
                                     <span className="comment-dateAdded">{getDateString(r.dateAdded)}</span>

@@ -23,7 +23,7 @@ export default function PrivatePosts(){
         {isAdmin?<ListScaffold title="Private Posts">
             <ul id="posts-list">
                 {docs.map((post)=>{
-                    return <li><PostPreview post={post}/></li>
+                    return <li key={post.id}><PostPreview post={post}/></li>
                 })}
             </ul>
         </ListScaffold>:<div id="private-no-access">No Access to Private Posts</div>}

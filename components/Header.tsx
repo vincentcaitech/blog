@@ -12,19 +12,19 @@ export default function Header(){
         <button className="menu-button" onClick={()=>setShowMenu(!showMenu)}>{showMenu?"Hide":"Menu"}</button>
         {(!isMobile||showMenu)&&<div id="dropdown-container">
             <ul id="menu">
-                <li>
+                <li key="posts">
                     <Link href="/posts"><a>Recent</a></Link>
                 </li>
-                <li>
+                <li key="featured">
                     <Link href="/featured"><a>Featured</a></Link>
                 </li>
-                <li>
+                <li key="topics">
                     <Link href="/topics"><a>Topics</a></Link>
                 </li>
-                <li>
+                <li key="about">
                     <Link href="/about"><a>About</a></Link>
                 </li>
-                {isAdmin&&<li>
+                {isAdmin&&<li key="private">
                     <Link href="/private"><a>Private</a></Link>
                 </li>}
             </ul>
