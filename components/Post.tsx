@@ -114,7 +114,7 @@ export default function Post(props){
         getRandomDocs();
         getComments(true);
 
-        setEdits(0); //do this for insurance, especially for loading a private doc, because this would be it's 2nd edit.
+        setEdits(-1); //do this because when you update the doc info, it registers as an edit
     },[props.id,props.isPrivate]) //need props.title or one of the properties for a client side loading of a private doc.
 
     const getRandomDocs = async () =>{
@@ -447,10 +447,10 @@ export default function Post(props){
 
         {isEditor&&<div id="editor-space">
             <h6>Editing Mode</h6>
-            {edits>1&&<button onClick={save} id="save-button">Publish</button>} 
+            {edits>=1&&<button onClick={save} id="save-button">Publish</button>} 
         </div>}
 
-        {isEditor&&edits>1&&<div id="unsaved-warning">WARNING: UNSAVED CHANGES</div>}
+        {isEditor&&edits>=1&&<div id="unsaved-warning">WARNING: UNSAVED CHANGES</div>}
 
         {deletePopup&&<Popup><div>
                 <div>Type "confirm" to confirm deletion</div>
