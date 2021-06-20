@@ -21,12 +21,8 @@ export default function Featured(){
         getRecentDocs();
     },[])
 
-    useEffect(()=>{
-        console.log(docs);
-    },[docs])
-
     const getRecentDocs = async () =>{
-        var res = (await pDatabase.collection("posts").orderBy("dateWritten","desc").where("isFeatured","==",true).limit(batchSize).get()).docs;
+        var res = (await pDatabase.collection("posts").orderBy("dateWritten","desc").where("isPrivate","==",false).where("isFeatured","==",true).limit(batchSize).get()).docs;
         var arr = res.map(doc=>{return {...doc.data(),id:doc.id}});
         setDocs(arr);
     }
@@ -34,7 +30,7 @@ export default function Featured(){
     return <ListScaffold title="Featured Posts">
         <ul id="posts-list">
             {docs.map((post)=>{
-                return <li><PostPreview post={post}/></li>
+                return <li key={post.id}><PostPreview post={post}/></li>
             })}
         </ul>
     </ListScaffold>

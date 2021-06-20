@@ -11,7 +11,6 @@ import PostPreview from "../../components/PostPreview";
 import { PContext } from "../../services/context";
 
 export default function Posts(){
-    const batchSize = 5;//five posts at a time;
     const router = useRouter();
 
     const [docs,setDocs] = useState([]);
@@ -21,15 +20,11 @@ export default function Posts(){
         getRecentDocs();
     },[])
 
-    useEffect(()=>{
-        console.log(docs);
-    },[docs])
-
-    const { isAdmin }= useContext(PContext);
+    const { isAdmin, batchSize }= useContext(PContext);
     
 
     const getRecentDocs = async () =>{
-        var res = (await pDatabase.collection("posts").orderBy("dateWritten","desc").limit(batchSize).get()).docs;
+        var res = (await pDatabase.collection("posts").where("isPrivate","==",false).orderBy("dateWritten","desc").limit(batchSize).get()).docs;
         var arr = res.map(doc=>{return {...doc.data(),id:doc.id}});
         setDocs(arr);
     }
@@ -49,8 +44,8 @@ export default function Posts(){
                 attachments: [],
                 comments: [],
                 isFeatured: false,
+                isPrivate: true,
             })
-            console.log(fbFieldValue);
             await pDatabase.collection("posts").doc("data").update({
                 ids: fbFieldValue.arrayUnion(res.id),
             })
@@ -66,7 +61,7 @@ export default function Posts(){
         {isAdmin&&<button id="add-post" onClick={newPost}>New Post</button>}
         <ul id="posts-list">
             {docs.map((post)=>{
-                return <li><PostPreview post={post}/></li>
+                return <li key={post.id}><PostPreview post={post}/></li>
             })}
         </ul>
     </ListScaffold>

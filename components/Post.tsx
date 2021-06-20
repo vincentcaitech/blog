@@ -17,7 +17,7 @@ import imageCompression from 'browser-image-compression';
 export default function Post(props){
     const router = useRouter();
     const context = useContext(PContext);
-    const isEditor = context["isAdmin"]
+    const [isEditor,setIsEditor] = useState(context["isAdmin"]);
     const commentBatchSize = context["commentBatchSize"];
     const [title,setTitle] = useState(props.title);
     const [subtitle,setSubtitle] = useState(props.subtitle);
@@ -28,6 +28,9 @@ export default function Post(props){
     const [topics,setTopics] = useState(props.topics)
     const [imageURL,setImageURL] = useState(props.imageURL);
     const [isFeatured,setIsFeatured] = useState(props.isFeatured)
+    const [isPrivate,setIsPrivate] = useState(props.isPrivate);
+
+    const [edits,setEdits] = useState<number>(0);
 
     const [togglePreview,setTogglePreview] = useState(false);
     const [topicInput,setTopicInput] = useState("");
@@ -51,16 +54,26 @@ export default function Post(props){
         if(context.loggedIn) setCommentUsername(pAuth.currentUser.displayName);
     },[context.loggedIn])
 
+    useEffect(()=>{
+        setIsEditor(context["isAdmin"]);
+    },[context["isAdmin"]])
+
+    //When an editable field is changed
+    useEffect(()=>{
+        setEdits(edits+1);
+    },[title, subtitle, author, body,topics, imageURL, isFeatured, isPrivate])
+
     const save = async () => {
         setSaving(true);
         try{
             await pDatabase.collection("posts").doc(props.id).update({
-                title, subtitle, author, body,topics, imageURL, dateModified: (new Date()).getTime(), isFeatured
+                title, subtitle, author, body,topics, imageURL, dateModified: (new Date()).getTime(), isFeatured, isPrivate
             })
         }catch(e){
             console.error(e);
         }
         setSaving(false);
+        setEdits(0);
     }
 
     const uploadJumboImage = async (e) => {
@@ -91,7 +104,8 @@ export default function Post(props){
         setBody(props.body);
         setTopics(props.topics)
         setImageURL(props.imageURL);
-        setIsFeatured(props.isFeatured)
+        setIsFeatured(props.isFeatured);
+        setIsPrivate(props.isPrivate);
         //Then reset these values;
         setLastComment(null);
         setLastReply({})
@@ -99,29 +113,31 @@ export default function Post(props){
         //Then call these functions: 
         getRandomDocs();
         getComments(true);
-    },[props.id])
+
+        setEdits(-1); //do this because when you update the doc info, it registers as an edit
+    },[props.id,props.isPrivate]) //need props.title or one of the properties for a client side loading of a private doc.
 
     const getRandomDocs = async () =>{
         var allDocs:string[] = (await pDatabase.collection("posts").doc("data").get()).data()["ids"];
         allDocs = allDocs.filter((id)=>id!=props.id);
         var arr:string[] = [];
+        var res= [];
         for(var i = 0 ;i<3;i++){//three random docs.
-            var index = Math.floor(Math.random()*allDocs.length)
-            arr.push(allDocs[index]);
+            var index = Math.floor(Math.random()*allDocs.length);
+            if(allDocs.length==0) break;
+            try{
+                var query = await pDatabase.collection("posts").doc(allDocs[index]).get();
+                
+                res.push({...query.data(),id: query.id});
+            }catch(e){
+                i--;
+            }
             allDocs.splice(index,1);
         }
-        var res = [];
-        console.log(arr);
-        
-        //Now get the data on these three docs.
-        res[0] = {...(await pDatabase.collection("posts").doc(arr[0]).get()).data(), id: arr[0]};
-        res[1] = {...(await pDatabase.collection("posts").doc(arr[1]).get()).data(), id: arr[1]};
-        res[2] = {...(await pDatabase.collection("posts").doc(arr[2]).get()).data(), id: arr[2]};
         setOtherPosts(res);
     }
 
     const getComments = async (isRefresh) =>{
-        console.log("getting comments");
         var postRef = pDatabase.collection("posts").doc(props.id);
         try{
             //Get all main comments (non-replies)
@@ -130,7 +146,6 @@ export default function Post(props){
             if(lastComment!=null&&!isRefresh) query = query.startAfter(lastComment);
             var res = (await query.get()).docs;
             var arr = res.map(c=>{return {...c.data(),replies:[],id: c.id}});
-            console.log(res);
 
             //Then get replies for each comment
             var repliesQuery = res.map(c=>{
@@ -138,8 +153,6 @@ export default function Post(props){
             });
             
             var allReplies = (await Promise.all(repliesQuery)).map(replies=>{return replies.docs;});
-            console.log(allReplies);
-
             //Then assign replies to corresponding comment;
             var i = 0;  //index of reply list matches index of the main comment they replied to.
             var newObj = {}; //for mapping of post id to last reply (for pagination)
@@ -153,7 +166,6 @@ export default function Post(props){
             })
             setLastReply({...lastReply,...newObj}); //combining lastReplys of all previous comments and theses new ones;
             setLastComment(res.length<commentBatchSize?-1:res[res.length-1]);
-            console.log(arr);
             if(!isRefresh) setComments([...comments,...arr]);
             else setComments([...arr]); //don't keep previous comments if a refresh for a new post
         }catch(e){
@@ -169,7 +181,6 @@ export default function Post(props){
            setLastReply(newObj); 
         }
         try{
-            console.log(lastReply[commentId]);
             if(!lastReply[commentId]) return;
             var res = (await pDatabase
                 .collection("posts")
@@ -182,19 +193,16 @@ export default function Post(props){
                 .get())
             //find index of the comment where the replies are to
             var index = findCommentIndex(commentId);
-            console.log(index);
             if(index==-1) return;
             var arr = [...comments];
             //then update the replies in comments
             res.docs.forEach(reply =>{
-                console.log(reply);
                 arr[index]["replies"].push({...reply.data(),id: reply.id});
             })
             setComments(arr);
             //set lastReply for this comment thread
             var newObj = {...lastReply};
             newObj[commentId] = res.docs.length<commentBatchSize?-1:res.docs[res.docs.length-1];
-            console.log(newObj[commentId],res.docs.length)
             
             setLastReply(newObj);
         }catch(e){
@@ -205,14 +213,25 @@ export default function Post(props){
     const deletePost = async () =>{
         setSaving(true);
         const id:string = props.id;
+        const hasImage:boolean = !(props.imageURL==""||props.imageURL==undefined);
         try{
+            //Delete the post document
             await pDatabase.collection("posts").doc(id).delete();
+            //Delete the id from the list of ids
             await pDatabase.collection("posts").doc('data').update({
                 ids: fbFieldValue.arrayRemove(id)
             })
-            await pStorage.child("images").child(id).delete();
+            //Delete the jumbo image from storage
+            if(hasImage) await pStorage.child("images").child(id).delete();
+            //Delete all comments in collection
+            var comments = await pDatabase.collection("posts").doc(id).collection("comments").get();
+            var batch = pDatabase.batch();
+            comments.docs.forEach(doc=>{
+                batch.delete(doc.ref);
+            })
+            await batch.commit();
             setSaving(false);
-            router.push("/");
+            router.push("/posts");
         }catch(e){
             console.error(e);
             setSaving(false);
@@ -293,10 +312,6 @@ export default function Post(props){
         return index;
     }
 
-    useEffect(()=>{
-        console.log(lastComment);
-    },[lastComment])
-
     return <div id="post">
         <div id="title-section"><h2 id="post-title">{isEditor?<EditInput placeholder="Title" set={setTitle} val={title}></EditInput>:title}</h2>
         <p id="post-subtitle">{isEditor?<EditInput placeholder="Subtitle" set={setSubtitle} val={subtitle}></EditInput>:subtitle}</p>
@@ -307,13 +322,13 @@ export default function Post(props){
                 <p id="post-author">By {isEditor?<EditInput placeholder="Author" set={setAuthor} val={author}></EditInput>:author}</p>
             </div>
             <ul>
-                <li>
+                <li key="posts">
                     <Link href="/posts"><a className="sb">Other Posts</a></Link>
                 </li>
-                {topics&&topics.length>0&&<li>
+                {topics&&topics.length>0&&<li key="topic">
                     <Link href={`/topics/${topics[0]}`}><a className="sb">{topics[0]}</a></Link>
                 </li>}
-                <li>
+                <li key="about">
                     <Link href="/about"><a className="sb">About</a></Link>
                 </li>
             </ul>
@@ -322,6 +337,9 @@ export default function Post(props){
             {isEditor?<button className={isFeatured?"featured":"notFeatured"} onClick={()=>setIsFeatured(!isFeatured)}>{isFeatured?"Featured ":"Not Featured"}</button>:
             isFeatured&&<div className="featured">Featured</div>}
         </section>
+        {isEditor&&<section id="isPrivate">
+            <button className={isPrivate?'private':'public'} onClick={()=>setIsPrivate(!isPrivate)}>{isPrivate?"Private":"Public"}</button>
+        </section>}
         <section id="jumbo-image" style={{backgroundImage: `url(${imageURL})`, backgroundSize: "cover"}}>
             {isEditor&&<div id="upload-jimage"><p>Upload A New Image</p><input type="file" onChange={uploadJumboImage}></input></div>}
         </section>
@@ -344,8 +362,8 @@ export default function Post(props){
                     setTopics(arr);
                 }}>Add Topic</button>
             </div>}
-            <ul><li>Topics:</li>
-                {topics&&topics.map(topic=><li>{topic}{isEditor&&<button onClick={()=>setTopics(topics.filter(t=>t!=topic))}>X</button>}</li>)}</ul>
+            <ul><li key="topics">Topics:</li>
+                {topics&&topics.map(topic=><li key={topic}>{topic}{isEditor&&<button onClick={()=>setTopics(topics.filter(t=>t!=topic))}>X</button>}</li>)}</ul>
         </section>
         {/* <section id="attachments">
             <h6>Attachments</h6>
@@ -363,7 +381,7 @@ export default function Post(props){
                 Log in to Comment
             </div>}
             <ul>{comments.sort((a,b)=>b.dateAdded-a.dateAdded).map(c=>{
-                return <li>
+                return <li key={c.id}>
                     <div className="comment-first-row">
                         <div className="comment-username">{c.username}</div>
                         <span className="comment-dateAdded">{getDateString(c.dateAdded)}</span>
@@ -387,7 +405,7 @@ export default function Post(props){
                             post={()=>postComment(c.id)} 
                         />}
                         {c.replies&&c.replies.sort((a,b)=>a.dateAdded-b.dateAdded).map(r=>{
-                            return <li>
+                            return <li key={r.id}>
                                 <div className="comment-first-row">
                                     <div className="comment-username">{r.username}</div>
                                     <span className="comment-dateAdded">{getDateString(r.dateAdded)}</span>
@@ -429,8 +447,10 @@ export default function Post(props){
 
         {isEditor&&<div id="editor-space">
             <h6>Editing Mode</h6>
-            <button onClick={save} id="save-button">Publish</button>    
+            {edits>=1&&<button onClick={save} id="save-button">Publish</button>} 
         </div>}
+
+        {isEditor&&edits>=1&&<div id="unsaved-warning">WARNING: UNSAVED CHANGES</div>}
 
         {deletePopup&&<Popup><div>
                 <div>Type "confirm" to confirm deletion</div>
