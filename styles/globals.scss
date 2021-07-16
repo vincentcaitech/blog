@@ -601,6 +601,10 @@ header{
   }
   #blog-body {
     font-size: 1.5em;
+    a{
+      text-decoration: underline;
+      color: purple;
+    }
     textarea{
       min-height: 100vh;
       min-width: 100%;
