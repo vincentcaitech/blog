@@ -1,12 +1,9 @@
 import { useContext, useEffect, useState } from "react"
 import ListScaffold from "../../components/ListScaffold"
 import { pAuth, pDatabase,fbFieldValue } from "../../services/config";
-import { getDateString } from "../../services/convert";
-import Link from "next/link"
 import Popup from "../../components/Popup";
 import Loading from "../../components/Loading"
 import { useRouter } from 'next/router'
-import { route } from "next/dist/next-server/server/router";
 import PostPreview from "../../components/PostPreview";
 import { PContext } from "../../services/context";
 
@@ -14,19 +11,39 @@ export default function Posts(){
     const router = useRouter();
 
     const [docs,setDocs] = useState([]);
+    const [lastDoc,setLastDoc] = useState(-1);
     const [loading,setLoading] = useState(false);
 
     useEffect(()=>{
-        getRecentDocs();
+        getRecentDocs(true);
     },[])
 
     const { isAdmin, batchSize }= useContext(PContext);
     
 
-    const getRecentDocs = async () =>{
-        var res = (await pDatabase.collection("posts").where("isPrivate","==",false).orderBy("dateWritten","desc").limit(batchSize).get()).docs;
-        var arr = res.map(doc=>{return {...doc.data(),id:doc.id}});
-        setDocs(arr);
+    const getRecentDocs = async (isFirst:boolean) =>{
+        try{
+            var query = pDatabase.collection("posts").where("isPrivate","==",false).orderBy("dateWritten","desc");
+            if(lastDoc==null){
+                return;
+            }else if(lastDoc!=-1&&!isFirst){ //still more to paginate, but also not first batch.
+                query = query.startAfter(lastDoc);
+            }
+            query = query.limit(batchSize);
+            var res = (await query.get()).docs;
+            console.log(res.length);
+            if(res.length==batchSize){
+                setLastDoc(res[res.length-1]);
+            }else{
+                setLastDoc(null);
+            }
+            var arr = res.map(doc=>{return {...doc.data(),id:doc.id}});
+            console.log(arr);
+            if(isFirst) setDocs(arr);
+            else setDocs([...docs,...arr]);
+        }catch(e){
+            console.error(e);
+        }
     }
 
     const newPost = async () =>{
@@ -63,6 +80,7 @@ export default function Posts(){
             {docs.map((post)=>{
                 return <li key={post.id}><PostPreview post={post}/></li>
             })}
+            {lastDoc!=null&&<button className="more-posts" onClick={()=>getRecentDocs(false)}>More Posts</button>}
         </ul>
     </ListScaffold>
 }

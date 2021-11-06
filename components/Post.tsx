@@ -1,7 +1,6 @@
 import Link from "next/link"
-import { useState, useRef, useEffect, useContext } from "react"
+import { useState, useEffect, useContext } from "react"
 import { getDateString } from "../services/convert"
-import dynamic from "next/dynamic";
 import 'draft-js/dist/Draft.css';
 import ReactMarkdown from 'react-markdown'
 import EditInput from "./EditInput";
@@ -60,7 +59,7 @@ export default function Post(props){
 
     //When an editable field is changed
     useEffect(()=>{
-        setEdits(edits+1);
+        setEdits(edits);
     },[title, subtitle, author, body,topics, imageURL, isFeatured, isPrivate])
 
     const save = async () => {
@@ -152,7 +151,7 @@ export default function Post(props){
                 return postRef.collection("comments").where("replyTo","==",c.id).orderBy("dateAdded","asc").limit(commentBatchSize).get();
             });
             
-            var allReplies = (await Promise.all(repliesQuery)).map(replies=>{return replies.docs;});
+            var allReplies = (await Promise.all(repliesQuery)).map(replies=>{return replies["docs"];});
             //Then assign replies to corresponding comment;
             var i = 0;  //index of reply list matches index of the main comment they replied to.
             var newObj = {}; //for mapping of post id to last reply (for pagination)
@@ -464,7 +463,7 @@ export default function Post(props){
         {commentToDelete&&<Popup>
             <div className="delete-comment-popup">
                 <h6>Delete This Comment?</h6>
-                <div><button className="rb" onClick={deleteComment}>Yes, Delete</button><button className="gb" onClick={()=>setCommentToDelete(null)}>Cancel</button></div>
+                <div><button className="rb" style={{border: "none"}} onClick={deleteComment}>Yes, Delete</button><button className="gb" onClick={()=>setCommentToDelete(null)}>Cancel</button></div>
                 {deleting&&<div className="deleting">Deleting ... </div>}
             </div></Popup>}
     </div>

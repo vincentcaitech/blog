@@ -7,7 +7,7 @@ import {PContext} from "../services/context";
 import {pAuth, pDatabase } from "../services/config";
 
 function MyApp({ Component, pageProps }) {
-  const [batchSize,setBatchSize] = useState(10);
+  const [batchSize,setBatchSize] = useState(3);
   const commentBatchSize = 5; //document getting varies with n^2, because this is batch size for both main comments and replies
   const [loggedIn,setLoggedIn] = useState(false);
   const [admins,setAdmins] = useState([]);

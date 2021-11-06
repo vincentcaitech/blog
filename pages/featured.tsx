@@ -1,30 +1,42 @@
-import { useContext, useEffect, useState } from "react"
+import {  useContext, useEffect, useState } from "react"
 import ListScaffold from "../components/ListScaffold"
-import { pAuth, pDatabase,fbFieldValue } from "../services/config";
-import { getDateString } from "../services/convert";
-import Link from "next/link"
-import Popup from "../components/Popup";
-import Loading from "../components/Loading"
-import { useRouter } from 'next/router'
-import { route } from "next/dist/next-server/server/router";
+import {pDatabase } from "../services/config";
 import PostPreview from "../components/PostPreview";
 import { PContext } from "../services/context";
 
-export default function Featured(){
-    const batchSize = 5;//five posts at a time;
-    const router = useRouter();
 
+export default function Featured(){
+    const {batchSize} = useContext(PContext);
     const [docs,setDocs] = useState([]);
-    const [loading,setLoading] = useState(false);
+    const [lastDoc,setLastDoc] = useState(-1);
 
     useEffect(()=>{
-        getRecentDocs();
+        getRecentDocs(true);
     },[])
 
-    const getRecentDocs = async () =>{
-        var res = (await pDatabase.collection("posts").orderBy("dateWritten","desc").where("isPrivate","==",false).where("isFeatured","==",true).limit(batchSize).get()).docs;
-        var arr = res.map(doc=>{return {...doc.data(),id:doc.id}});
-        setDocs(arr);
+    const getRecentDocs = async (isFirst:boolean) =>{
+        try{
+            var query = pDatabase.collection("posts").where("isPrivate","==",false).where("isFeatured","==",true).orderBy("dateWritten","desc");
+            if(lastDoc==null){
+                return;
+            }else if(lastDoc!=-1&&!isFirst){ //still more to paginate, but also not first batch.
+                query = query.startAfter(lastDoc);
+            }
+            query = query.limit(batchSize);
+            var res = (await query.get()).docs;
+            console.log(res.length);
+            if(res.length==batchSize){
+                setLastDoc(res[res.length-1]);
+            }else{
+                setLastDoc(null);
+            }
+            var arr = res.map(doc=>{return {...doc.data(),id:doc.id}});
+            console.log(arr);
+            if(isFirst) setDocs(arr);
+            else setDocs([...docs,...arr]);
+        }catch(e){
+            console.error(e);
+        }
     }
 
     return <ListScaffold title="Featured Posts">
@@ -32,6 +44,7 @@ export default function Featured(){
             {docs.map((post)=>{
                 return <li key={post.id}><PostPreview post={post}/></li>
             })}
+            {lastDoc!=null&&<button className="more-posts" onClick={()=>getRecentDocs(false)}>More Posts</button>}
         </ul>
     </ListScaffold>
 }

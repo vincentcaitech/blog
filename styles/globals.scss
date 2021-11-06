@@ -201,6 +201,104 @@ header{
   }
 }
 
+#top-homepage{
+  margin: 10px;
+  margin-top: 10vh;
+  color: lightgray;
+  h6{
+    font-size: 18px;
+    margin: 0px;
+  }
+  p{
+    margin: 0px;
+    font-size: 10px;
+  }
+}
+
+.homepage-divider{
+  @include row();
+  .collage{
+    color:white;
+    ul#collage-list{
+      list-style: none;
+      margin: 0px;
+      padding: 0px;
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      width: 450px;
+      li.collage-item{
+        height: 150px;
+        width: 150px;
+        background-size: cover;
+        background-position: center;
+        opacity: 0.3;
+        @include row();
+        align-items: flex-end;
+        &:hover{
+          opacity: 0.4;
+        }
+        &.focused{
+          opacity: 1;
+        }
+        .dateWritten{
+          background-color: white;
+          color: black;
+          font-weight: bold;
+          padding: 5px 10px;
+        }
+      }
+    }
+  }
+
+  .right{
+    color: white;
+    margin-left: 30px;
+    position: relative;
+    margin-right: 30px;
+    h2{
+      font-size: 36px;
+      margin: 0px;
+    }
+    p{
+      margin: 0px;
+    }
+    .link-to-post, #click-arrow{
+      position: absolute;
+      bottom: -40px;
+      left: 0px;
+      padding: 5px 15px;
+      color: black;
+      font-weight: bold;
+      width: 150px;
+      text-align: center;
+      display: block;
+      background-color: orange;
+      transition: all 0.2s;
+      &:hover{
+        background-color: rgb(64, 224, 0);
+      }
+    }
+    #click-arrow{
+      background-color: white;
+      top: -100px;
+      height: 30px;
+      width: 250px;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      left: -40px;
+      span{
+        height: 20px;
+        width: 30px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        display: block;
+      }
+    }
+  }
+}
+
 @media (max-width: $mobile-break){
   header{
     padding: 1vh 5vw;
@@ -223,6 +321,30 @@ header{
       }
     }
   }
+
+  .homepage-divider {
+    display: block;
+    .collage ul#collage-list {
+      width: 100vw;
+      li.collage-item{
+        width: 33.33vw;
+        height: 33.33vw;
+        div{
+          font-size: 12px;
+        }
+      }
+    }
+    .right{
+      margin: 30px 10px 0px 10px;
+      h2{
+        font-size: 24px;
+      }
+      p{
+        font-size: 12px;
+      }
+    }
+  }
+
 }
 
 #listscaffold{
@@ -262,8 +384,18 @@ header{
   @include row();
   flex-direction: column;
   margin-top: 20vh;
-  margin-bottom: 50vh;
   padding: 0px;
+  margin-bottom: 50vh;
+}
+
+button.more-posts{
+  text-align: center;
+  font-weight: bold;
+  background-color: white;
+  border: none;
+  padding: 10px 30px;
+  font-size: 20px;
+  @include hoverer1();
 }
 
 #single-post{
@@ -868,8 +1000,8 @@ header{
   .add-comment-section{
     margin: 15px 0px;
     padding: 5px 10px;
-    border-radius: 10px;
-    background-color: lightgrey;
+    background-color: rgb(167, 167, 167);
+    box-shadow: 3px 3px 5px rgb(151, 151, 151);
     h6{
       font-size: 16px;
       margin: 0px;
@@ -881,9 +1013,9 @@ header{
       margin-bottom: 5px;
       border: none;
       font-size: 12px;
-      border-radius: 5px;
       padding: 3px 5px;
       font-weight: bold;
+      background-color: lightgray;
       &:focus{
         outline: none;
       }
@@ -893,13 +1025,24 @@ header{
       max-width: 100%;
       min-width: 100%;
       padding: 5px 10px;
-      border-radius: 5px;
-      max-height: 40px;
-      min-height: 40px;
+      border: none;
+      max-height: 35px;
+      min-height: 35px;
       font-size: 16px;
       margin: 0px;
+      border-bottom: 2px solid black;
       &:focus{
         outline: none;
+      }
+    }
+    .post-comment{
+      padding: 5px 15px;
+      font-weight: bold;
+      border: none;
+      background-color: black;
+      color: white;
+      &:hover{
+        background-color: green;
       }
     }
   }
