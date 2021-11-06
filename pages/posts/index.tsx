@@ -11,7 +11,7 @@ export default function Posts(){
     const router = useRouter();
 
     const [docs,setDocs] = useState([]);
-    const [lastDoc,setLastDoc] = useState(-1);
+    const [lastDoc,setLastDoc] = useState<any>(-1);
     const [loading,setLoading] = useState(false);
 
     useEffect(()=>{

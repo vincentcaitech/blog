@@ -6,7 +6,7 @@ import { PContext } from "../services/context";
 
 export default function PrivatePosts(){
     const [docs,setDocs] = useState([]);
-    const [lastDoc,setLastDoc] = useState(-1); 
+    const [lastDoc,setLastDoc] = useState<any>(-1); 
 
     const { isAdmin, batchSize } = useContext(PContext);
 

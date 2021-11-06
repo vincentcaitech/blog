@@ -8,7 +8,7 @@ import { PContext } from "../services/context";
 export default function Featured(){
     const {batchSize} = useContext(PContext);
     const [docs,setDocs] = useState([]);
-    const [lastDoc,setLastDoc] = useState(-1);
+    const [lastDoc,setLastDoc] = useState<any>(-1);
 
     useEffect(()=>{
         getRecentDocs(true);
