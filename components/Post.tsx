@@ -60,7 +60,7 @@ export default function Post(props){
     //When an editable field is changed
     useEffect(()=>{
         setEdits(edits+1);
-    },[title, subtitle, author, body,topics.length, imageURL, isFeatured, isPrivate])
+    },[title, subtitle, author, body,topics?topics.length:topics, imageURL, isFeatured, isPrivate])
 
     const save = async () => {
         setSaving(true);
